@@ -31,6 +31,7 @@ import java.util.Date;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
@@ -259,6 +260,9 @@ public class RemoteDir extends DirComponent implements ListSelectionListener,
         buttonPanel.add(cdButton);
         buttonPanel.add(deleteButton);
         buttonPanel.add(cdUpButton);
+        JButton undoButton = new JButton("Undo");
+        undoButton.addActionListener(this);
+        buttonPanel.add(undoButton);
         buttonPanel.add(new JLabel("  "));
 
         buttonPanel.add(cmdButton);
@@ -831,6 +835,10 @@ public class RemoteDir extends DirComponent implements ListSelectionListener,
         {
             JFtp.remoteDir.getCon().chdir("..");
         }
+        else if(e.getActionCommand().equals("Undo"))
+        {
+            ((FtpConnection) con).undo();
+        }
         else if(e.getActionCommand().equals("rn"))
         {
             Object[] target = jl.getSelectedValues();
@@ -860,6 +868,7 @@ public class RemoteDir extends DirComponent implements ListSelectionListener,
                 else
                 {
                     Log.debug("Successfully renamed.");
+                    ((FtpConnection) con).undoStack.push(new String[] {"rename", path + target[0], path + val});
                     fresh();
                 }
             }
